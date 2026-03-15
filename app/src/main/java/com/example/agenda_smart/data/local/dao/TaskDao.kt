@@ -1,4 +1,7 @@
 package com.example.agenda_smart.data.local.dao
 
-class TaskDao {
+import androidx.room.Dao
+
+@Dao
+interface TaskDao {
 }
