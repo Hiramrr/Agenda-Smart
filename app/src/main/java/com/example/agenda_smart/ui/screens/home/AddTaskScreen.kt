@@ -192,7 +192,7 @@ fun AddTaskScreen(
                     viewModel.saveTask(
                         title = title,
                         description = description,
-                        dateTimestamp = datePickerState.selectedDateMillis ?: 0L,
+                        dateString = selectedDateText, // ¡Aquí pasamos el texto!
                         timeString = selectedTimeText,
                         isFavorite = isFavorite
                     )
@@ -227,6 +227,8 @@ fun AddTaskScreen(
                     showDatePicker = false
                     datePickerState.selectedDateMillis?.let { millis ->
                         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                        // ¡AGREGA ESTA LÍNEA!
+                        formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
                         selectedDateText = formatter.format(Date(millis))
                     }
                 }) { Text("Aceptar") }

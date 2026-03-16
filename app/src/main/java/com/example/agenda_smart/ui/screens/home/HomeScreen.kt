@@ -24,8 +24,9 @@ fun HomeScreen(
     val tabs = listOf("Hoy", "Programados", "Importante")
     var selectedTab by remember { mutableIntStateOf(0) }
 
-    // Observamos las listas de tareas desde el ViewModel
-    val allTasks by viewModel.allTasks.collectAsState()
+    // Observamos las TRES listas distintas ahora
+    val todayTasks by viewModel.todayTasks.collectAsState()
+    val upcomingTasks by viewModel.upcomingTasks.collectAsState()
     val favoriteTasks by viewModel.favoriteTasks.collectAsState()
 
     Scaffold(
@@ -49,19 +50,19 @@ fun HomeScreen(
                 }
             }
 
-            // Dependiendo de la pestaña seleccionada, elegimos qué lista mostrar
+            // ¡AQUÍ ESTÁ LA MAGIA DE LAS PESTAÑAS!
             val tasksToShow = when (selectedTab) {
-                2 -> favoriteTasks // Pestaña "Importante"
-                else -> allTasks   // Pestañas "Hoy" y "Programados" (por ahora muestran todas)
+                0 -> todayTasks     // Pestaña 0: Tareas con la fecha de hoy
+                1 -> upcomingTasks  // Pestaña 1: Tareas con fecha del futuro
+                2 -> favoriteTasks  // Pestaña 2: Tareas marcadas con estrella
+                else -> emptyList()
             }
 
             if (tasksToShow.isEmpty()) {
-                // Mensaje si no hay tareas
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("No hay tareas para mostrar", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
-                // Dibujamos la lista de tareas
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()

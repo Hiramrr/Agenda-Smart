@@ -5,18 +5,26 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.agenda_smart.data.local.entity.TaskEntity
-import kotlinx.coroutines.flow.Flow // Asegúrate de importar esto
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: TaskEntity)
 
-    // Consulta para obtener TODAS las tareas, ordenadas por fecha
+    // TODAS las tareas (la que ya tenías)
     @Query("SELECT * FROM tasks ORDER BY dateTimestamp ASC")
     fun getAllTasks(): Flow<List<TaskEntity>>
 
-    // Consulta para obtener SOLO las tareas marcadas como favoritas
+    // SOLO FAVORITAS (la que ya tenías)
     @Query("SELECT * FROM tasks WHERE isFavorite = 1 ORDER BY dateTimestamp ASC")
     fun getFavoriteTasks(): Flow<List<TaskEntity>>
+
+    // NUEVA: Tareas para un día en específico (Ej. Hoy) ordenadas por hora
+    @Query("SELECT * FROM tasks WHERE dateTimestamp = :dayTimestamp ORDER BY timeString ASC")
+    fun getTasksForDay(dayTimestamp: Long): Flow<List<TaskEntity>>
+
+    // NUEVA: Tareas programadas para después de hoy
+    @Query("SELECT * FROM tasks WHERE dateTimestamp > :dayTimestamp ORDER BY dateTimestamp ASC, timeString ASC")
+    fun getUpcomingTasks(dayTimestamp: Long): Flow<List<TaskEntity>>
 }
