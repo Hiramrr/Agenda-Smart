@@ -60,4 +60,26 @@ class HomeViewModel @Inject constructor(
             taskRepository.insertTask(newTask)
         }
     }
+
+    // 1. Marca la tarea como completada (Se irá al historial automáticamente)
+    fun completeTask(task: TaskEntity) {
+        viewModelScope.launch {
+            // Hacemos una copia de la tarea pero con isCompleted = true
+            taskRepository.updateTask(task.copy(isCompleted = true))
+        }
+    }
+
+    // 2. Alterna el estado de Favorito (La agrega o quita de Importante)
+    fun toggleFavoriteTask(task: TaskEntity) {
+        viewModelScope.launch {
+            taskRepository.updateTask(task.copy(isFavorite = !task.isFavorite))
+        }
+    }
+
+    // 3. Elimina la tarea de la base de datos por completo
+    fun deleteTask(task: TaskEntity) {
+        viewModelScope.launch {
+            taskRepository.deleteTask(task)
+        }
+    }
 }

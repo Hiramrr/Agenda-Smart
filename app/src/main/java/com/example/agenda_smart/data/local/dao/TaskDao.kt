@@ -6,6 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.agenda_smart.data.local.entity.TaskEntity
 import kotlinx.coroutines.flow.Flow
+import androidx.room.Update
+import androidx.room.Delete
 
 @Dao
 interface TaskDao {
@@ -31,4 +33,10 @@ interface TaskDao {
     // NUEVA: Tareas del historial (ya pasaron de fecha o están completadas)
     @Query("SELECT * FROM tasks WHERE dateTimestamp < :dayTimestamp OR isCompleted = 1 ORDER BY dateTimestamp DESC, timeString DESC")
     fun getHistoryTasks(dayTimestamp: Long): Flow<List<TaskEntity>>
+
+    @Update
+    suspend fun updateTask(task: TaskEntity)
+
+    @Delete
+    suspend fun deleteTask(task: TaskEntity)
 }

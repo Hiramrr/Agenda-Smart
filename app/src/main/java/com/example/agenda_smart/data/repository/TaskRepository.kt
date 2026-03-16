@@ -33,4 +33,12 @@ class TaskRepository @Inject constructor(
         val today = DateUtils.inicioDia()
         return taskDao.getHistoryTasks(today)
     }
+
+    suspend fun updateTask(task: TaskEntity) {
+        taskDao.updateTask(task)
+    }
+
+    suspend fun deleteTask(task: TaskEntity) {
+        taskDao.deleteTask(task)
+    }
 }
