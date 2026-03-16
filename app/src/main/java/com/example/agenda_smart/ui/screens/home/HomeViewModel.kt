@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import kotlinx.coroutines.flow.firstOrNull
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -80,6 +81,38 @@ class HomeViewModel @Inject constructor(
     fun deleteTask(task: TaskEntity) {
         viewModelScope.launch {
             taskRepository.deleteTask(task)
+        }
+    }
+
+    // Busca una tarea una sola vez para llenar el formulario de edición
+    suspend fun getTaskByIdSync(taskId: Int): TaskEntity? {
+        return taskRepository.getTaskById(taskId).firstOrNull()
+    }
+
+    // 2. Actualiza la tarea editada
+    fun updateTaskFromEdit(
+        existingTask: TaskEntity,
+        newTitle: String,
+        newDescription: String,
+        newDateString: String,
+        newTimeString: String,
+        newIsFavorite: Boolean
+    ) {
+        viewModelScope.launch {
+            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val date = formatter.parse(newDateString) ?: Date()
+            val normalizedTimestamp = DateUtils.inicioDia(date.time)
+
+            // Copiamos la tarea existente pero con los datos nuevos
+            val updatedTask = existingTask.copy(
+                title = newTitle,
+                description = newDescription,
+                dateTimestamp = normalizedTimestamp,
+                timeString = newTimeString,
+                isFavorite = newIsFavorite
+                // ¡No tocamos isCompleted para que no se altere su estado en el historial!
+            )
+            taskRepository.updateTask(updatedTask)
         }
     }
 }

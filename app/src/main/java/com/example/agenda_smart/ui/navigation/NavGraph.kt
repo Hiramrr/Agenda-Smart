@@ -35,5 +35,14 @@ fun NavGraph() {
         composable(Screen.AddTask.route) {
             AddTaskScreen(navController = rootNavController)
         }
+
+        // ¡Ruta para EDITAR una tarea! Reutiliza AddTaskScreen pero le pasa el ID
+        composable(
+            route = Screen.EditTask.ROUTE,
+            arguments = listOf(navArgument("taskId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val taskId = backStackEntry.arguments?.getInt("taskId")
+            AddTaskScreen(navController = rootNavController, taskIdToEdit = taskId)
+        }
     }
 }

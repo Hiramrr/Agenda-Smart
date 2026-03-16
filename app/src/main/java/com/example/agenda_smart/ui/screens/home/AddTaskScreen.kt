@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.agenda_smart.data.local.entity.TaskEntity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,7 +30,8 @@ import java.util.Locale
 @Composable
 fun AddTaskScreen(
     navController: NavHostController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    taskIdToEdit: Int? = null
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -46,32 +48,52 @@ fun AddTaskScreen(
     // Definimos un color dorado para la estrella
     val goldColor = Color(0xFFFFC107)
 
+    // --- LÓGICA DE EDICIÓN ---
+    var existingTask by remember { mutableStateOf<TaskEntity?>(null) }
+    var isLoading by remember { mutableStateOf(taskIdToEdit != null) }
+
+    // Si recibimos un ID, cargamos los datos de la base de datos
+    LaunchedEffect(taskIdToEdit) {
+        if (taskIdToEdit != null) {
+            val task = viewModel.getTaskByIdSync(taskIdToEdit)
+            if (task != null) {
+                existingTask = task
+                title = task.title
+                description = task.description
+                isFavorite = task.isFavorite
+                selectedTimeText = task.timeString
+
+                val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+                selectedDateText = formatter.format(Date(task.dateTimestamp))
+                datePickerState.selectedDateMillis = task.dateTimestamp
+            }
+            isLoading = false
+        }
+    }
+
+    // Título dinámico
+    val screenTitle = if (taskIdToEdit != null) "Editar Actividad" else "Nueva Actividad"
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "Nueva Actividad",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
+                title = { Text(screenTitle, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Regresar")
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         }
     ) { paddingValues ->
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+            return@Scaffold
+        }
+
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 24.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 24.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
 
@@ -186,31 +208,38 @@ fun AddTaskScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Botón con sombra (Elevation)
+            // ¡BOTÓN DE GUARDAR DINÁMICO!
             Button(
                 onClick = {
-                    viewModel.saveTask(
-                        title = title,
-                        description = description,
-                        dateString = selectedDateText, // ¡Aquí pasamos el texto!
-                        timeString = selectedTimeText,
-                        isFavorite = isFavorite
-                    )
+                    if (existingTask != null) {
+                        // MODO EDICIÓN
+                        viewModel.updateTaskFromEdit(
+                            existingTask = existingTask!!,
+                            newTitle = title,
+                            newDescription = description,
+                            newDateString = selectedDateText,
+                            newTimeString = selectedTimeText,
+                            newIsFavorite = isFavorite
+                        )
+                    } else {
+                        // MODO NUEVA TAREA
+                        viewModel.saveTask(
+                            title = title,
+                            description = description,
+                            dateString = selectedDateText,
+                            timeString = selectedTimeText,
+                            isFavorite = isFavorite
+                        )
+                    }
                     navController.popBackStack()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 6.dp,
-                    pressedElevation = 2.dp,
-                    disabledElevation = 0.dp
-                ),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp, pressedElevation = 2.dp),
                 enabled = title.isNotBlank() && selectedDateText.isNotBlank() && selectedTimeText.isNotBlank()
             ) {
                 Text(
-                    text = "Guardar Actividad",
+                    text = if (existingTask != null) "Actualizar Actividad" else "Guardar Actividad",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontWeight = FontWeight.Bold
                 )
@@ -218,7 +247,7 @@ fun AddTaskScreen(
         }
     }
 
-    // --- Diálogos de Fecha y Hora (Sin cambios) ---
+    // --- Diálogos de Fecha y Hora---
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },

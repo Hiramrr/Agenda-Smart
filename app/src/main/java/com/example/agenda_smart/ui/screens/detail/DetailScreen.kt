@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,7 +26,7 @@ import androidx.navigation.NavHostController
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
+import com.example.agenda_smart.ui.navigation.Screen //esperando que este correcto
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
@@ -37,14 +38,25 @@ fun DetailScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { }, // Lo dejamos vacío para un look más limpio
+                title = { },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Regresar")
                     }
                 },
+                // ¡Agregamos el botón de editar aquí!
+                actions = {
+                    IconButton(
+                        onClick = {
+                            // Navegamos a la ruta de edición enviando el ID
+                            task?.let { navController.navigate(Screen.EditTask.createRoute(it.id)) }
+                        }
+                    ) {
+                        Icon(Icons.Outlined.Edit, contentDescription = "Editar Tarea")
+                    }
+                },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent // Barra superior transparente
+                    containerColor = Color.Transparent
                 )
             )
         }
