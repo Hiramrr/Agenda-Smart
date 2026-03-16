@@ -32,7 +32,7 @@ class HomeViewModel @Inject constructor(
     val favoriteTasks: StateFlow<List<TaskEntity>> = taskRepository.getFavoriteTasks()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // ¡AQUÍ ESTÁ LA LISTA QUE FALTA! (Lista 4: HISTORIAL)
+    // Lista 4: HISTORIAL
     val historyTasks: StateFlow<List<TaskEntity>> = taskRepository.getHistoryTasks()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -61,7 +61,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // 1. Marca la tarea como completada (Se irá al historial automáticamente)
+    // 1. marca la tarea como completada (se irá al historial automáticamente)
     fun completeTask(task: TaskEntity) {
         viewModelScope.launch {
             // Hacemos una copia de la tarea pero con isCompleted = true
@@ -69,14 +69,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // 2. Alterna el estado de Favorito (La agrega o quita de Importante)
+    // 2. alterna el estado de Favorito (la agrega o quita de Importante)
     fun toggleFavoriteTask(task: TaskEntity) {
         viewModelScope.launch {
             taskRepository.updateTask(task.copy(isFavorite = !task.isFavorite))
         }
     }
 
-    // 3. Elimina la tarea de la base de datos por completo
+    // 3.elimina la tarea de la base de datos por completo
     fun deleteTask(task: TaskEntity) {
         viewModelScope.launch {
             taskRepository.deleteTask(task)

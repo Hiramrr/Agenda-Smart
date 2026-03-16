@@ -31,6 +31,8 @@ object DatabaseModule {
     fun provideTaskDao(appDatabase: AppDatabase): TaskDao {
         return appDatabase.taskDao()
     }
+
+    // se descomenta hasta que se implemente las notas
     //@Provides
     //fun provideNoteDao(database: AppDatabase) = database.noteDao()
 }
