@@ -1,48 +1,69 @@
 package com.example.agenda_smart.ui.screens.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.material.icons.outlined.Subject
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.hilt.navigation.compose.hiltViewModel
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTaskScreen(navController: NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
-    // Estados para los textos
+fun AddTaskScreen(
+    navController: NavHostController,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var isFavorite by remember { mutableStateOf(false) }
 
-    // Estados para el DatePicker (Fecha)
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     var selectedDateText by remember { mutableStateOf("") }
 
-    // Estados para el TimePicker (Hora)
     var showTimePicker by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState()
     var selectedTimeText by remember { mutableStateOf("") }
 
+    // Definimos un color dorado para la estrella
+    val goldColor = Color(0xFFFFC107)
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Nueva Actividad") },
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Nueva Actividad",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Regresar")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { paddingValues ->
@@ -50,100 +71,154 @@ fun AddTaskScreen(navController: NavHostController, viewModel: HomeViewModel = h
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 24.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+
+            // Colores personalizados para los campos de texto (Soft UI)
+            val textFieldColors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = Color.Transparent, // Sin borde cuando no está enfocado
+            )
+
+            // Campo de Título
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Título") },
+                label = { Text("Título de la actividad") },
+                leadingIcon = {
+                    Icon(Icons.Outlined.Edit, contentDescription = "Título", tint = MaterialTheme.colorScheme.primary)
+                },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+                colors = textFieldColors
             )
 
+            // Campo de Descripción
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Descripción (opcional)") },
+                leadingIcon = {
+                    Icon(Icons.Outlined.Subject, contentDescription = "Descripción", tint = MaterialTheme.colorScheme.primary)
+                },
                 modifier = Modifier.fillMaxWidth(),
-                minLines = 3
+                minLines = 3,
+                shape = RoundedCornerShape(16.dp),
+                colors = textFieldColors
             )
 
             // Fila para Fecha y Hora
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Selector de Fecha
                 OutlinedTextField(
-                    value = selectedDateText.ifEmpty { "Seleccionar" },
+                    value = selectedDateText.ifEmpty { "Fecha" },
                     onValueChange = { },
-                    label = { Text("Fecha") },
                     readOnly = true,
                     modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(16.dp),
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Fecha")
+                            Icon(Icons.Default.DateRange, contentDescription = "Fecha", tint = MaterialTheme.colorScheme.primary)
                         }
-                    }
+                    },
+                    colors = textFieldColors
                 )
 
-                // Selector de Hora
                 OutlinedTextField(
-                    value = selectedTimeText.ifEmpty { "Seleccionar" },
+                    value = selectedTimeText.ifEmpty { "Hora" },
                     onValueChange = { },
-                    label = { Text("Hora") },
                     readOnly = true,
                     modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(16.dp),
                     trailingIcon = {
                         IconButton(onClick = { showTimePicker = true }) {
-                            Text("⏰") // Un emoji simple o podrías usar un ícono
+                            Icon(Icons.Default.AccessTime, contentDescription = "Hora", tint = MaterialTheme.colorScheme.primary)
                         }
-                    }
+                    },
+                    colors = textFieldColors
                 )
             }
 
-            // Switch de Favorito
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            // Switch de Favorito rediseñado
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable { isFavorite = !isFavorite },
+                color = if (isFavorite) goldColor.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
             ) {
-                Text("Marcar como Favorito")
-                Switch(
-                    checked = isFavorite,
-                    onCheckedChange = { isFavorite = it }
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Default.Star else Icons.Outlined.StarBorder,
+                            contentDescription = "Favorito",
+                            tint = if (isFavorite) goldColor else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "Marcar como importante",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            color = if (isFavorite) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = isFavorite,
+                        onCheckedChange = { isFavorite = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = goldColor
+                        )
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
+            // Botón con sombra (Elevation)
             Button(
                 onClick = {
-                    // ¡AQUÍ ESTÁ LA MAGIA!
-                    // Llamamos a la función del ViewModel para guardar
                     viewModel.saveTask(
                         title = title,
                         description = description,
-                        // Convertimos la fecha a Long (milisegundos) o mandamos 0L si hay error
                         dateTimestamp = datePickerState.selectedDateMillis ?: 0L,
                         timeString = selectedTimeText,
                         isFavorite = isFavorite
                     )
-
-                    // Regresamos a la pantalla anterior después de guardar
                     navController.popBackStack()
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 6.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp
+                ),
                 enabled = title.isNotBlank() && selectedDateText.isNotBlank() && selectedTimeText.isNotBlank()
             ) {
-                Text("Guardar Actividad")
+                Text(
+                    text = "Guardar Actividad",
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
 
-    // --- Diálogos (Ventanas emergentes) para Fecha y Hora ---
-
+    // --- Diálogos de Fecha y Hora (Sin cambios) ---
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
@@ -151,7 +226,6 @@ fun AddTaskScreen(navController: NavHostController, viewModel: HomeViewModel = h
                 TextButton(onClick = {
                     showDatePicker = false
                     datePickerState.selectedDateMillis?.let { millis ->
-                        // Convertimos los milisegundos a texto (ej. 25/10/2023)
                         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                         selectedDateText = formatter.format(Date(millis))
                     }
@@ -171,7 +245,6 @@ fun AddTaskScreen(navController: NavHostController, viewModel: HomeViewModel = h
             confirmButton = {
                 TextButton(onClick = {
                     showTimePicker = false
-                    // Formateamos la hora para que siempre tenga 2 dígitos (ej. 09:05)
                     val hour = timePickerState.hour.toString().padStart(2, '0')
                     val minute = timePickerState.minute.toString().padStart(2, '0')
                     selectedTimeText = "$hour:$minute"
