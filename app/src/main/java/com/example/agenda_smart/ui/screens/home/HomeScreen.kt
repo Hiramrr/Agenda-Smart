@@ -161,7 +161,7 @@ fun HomeScreen(
     }
 }
 
-// NUEVO: Componente visual para cada botoncito del menú inferior
+// componente visual para cada botoncito del menú inferior
 @Composable
 fun MenuActionItem(
     icon: ImageVector,
@@ -174,13 +174,13 @@ fun MenuActionItem(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
             .clickable { onClick() }
-            .padding(12.dp) // Espacio para que el efecto de toque se vea bien
+            .padding(12.dp)
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
             tint = iconColor,
-            modifier = Modifier.size(28.dp) // Íconos ligeramente más grandes
+            modifier = Modifier.size(28.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -205,20 +205,19 @@ fun TaskCard(
     }
     val dateString = formatter.format(Date(task.dateTimestamp))
 
-    // Efectos visuales si la tarea ya está completada
+    // eeefectos visuales si la tarea ya está completada
     val cardAlpha = if (task.isCompleted) 0.6f else 1f
     val textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)) // Esquinas bien redondeadas
+            .clip(RoundedCornerShape(16.dp))
             .combinedClickable(
                 onClick = { onClick() },
                 onLongClick = { onLongClick() }
             )
-            .alpha(cardAlpha), // Baja la opacidad si está completada
-        // Diseño plano minimalista (Sin sombra, color de fondo suave)
+            .alpha(cardAlpha),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
@@ -235,7 +234,6 @@ fun TaskCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                // Columna para el Título y Descripción (Toma el espacio disponible)
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = task.title,
@@ -273,7 +271,6 @@ fun TaskCard(
                         )
                     }
                     if (task.isFavorite) {
-                        // ¡Adiós emoji, hola ícono Material!
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = "Importante",

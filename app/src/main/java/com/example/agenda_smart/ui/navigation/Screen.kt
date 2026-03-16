@@ -11,6 +11,13 @@ sealed class Screen(val route: String) {
         }
     }
 
+    data class EditTask(val taskId: Int) : Screen("edit_task/{taskId}") {
+        companion object {
+            const val ROUTE = "edit_task/{taskId}"
+            fun createRoute(taskId: Int) = "edit_task/$taskId"
+        }
+    }
+
     object  AddTask : Screen("add_task")
 
 }
