@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.example.agenda_smart.data.local.AppDatabase
+import com.example.agenda_smart.data.local.dao.NoteDao
 import com.example.agenda_smart.data.local.dao.TaskDao
 import dagger.Module
 import dagger.Provides
@@ -32,7 +33,9 @@ object DatabaseModule {
         return appDatabase.taskDao()
     }
 
-    // se descomenta hasta que se implemente las notas
-    //@Provides
-    //fun provideNoteDao(database: AppDatabase) = database.noteDao()
+    @Provides
+    @Singleton
+    fun provideNoteDao(database: AppDatabase): NoteDao {
+        return database.noteDao()
+    }
 }

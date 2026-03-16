@@ -18,6 +18,5 @@ import com.example.agenda_smart.data.local.entity.TaskEntity
 abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
 
-    //se descomenta hasta que se me implemente las notas
-    //abstract fun noteDao(): NoteDao
+    abstract fun noteDao(): NoteDao
 }

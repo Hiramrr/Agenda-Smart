@@ -46,4 +46,8 @@ class TaskRepository @Inject constructor(
     fun getTaskById(taskId: Int): Flow<TaskEntity> {
         return taskDao.getTaskById(taskId)
     }
+
+    fun getTasksForDay(dayTimestamp: Long): Flow<List<TaskEntity>> {
+        return taskDao.getTasksForDay(DateUtils.inicioDia(dayTimestamp))
+    }
 }

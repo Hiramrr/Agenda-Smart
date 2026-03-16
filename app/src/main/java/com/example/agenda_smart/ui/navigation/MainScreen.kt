@@ -20,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
+import com.example.agenda_smart.ui.screens.calendar.CalendarScreen
 import com.example.agenda_smart.ui.screens.home.HomeScreen
 
 data class BottonNavItem(
@@ -73,7 +74,7 @@ fun MainScreen(rootNavController: NavHostController) {
                 HomeScreen(rootNavController)
             }
             composable(Screen.Calendar.route) {
-                //aqui va la del calendario cuando este hecho
+                CalendarScreen()
             }
         }
     }
