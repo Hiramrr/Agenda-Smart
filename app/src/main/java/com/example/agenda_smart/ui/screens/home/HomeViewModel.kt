@@ -2,6 +2,7 @@ package com.example.agenda_smart.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.agenda_smart.data.DateUtils
 import com.example.agenda_smart.data.local.entity.TaskEntity
 import com.example.agenda_smart.data.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,11 +10,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import com.example.agenda_smart.data.DateUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -32,26 +32,27 @@ class HomeViewModel @Inject constructor(
     val favoriteTasks: StateFlow<List<TaskEntity>> = taskRepository.getFavoriteTasks()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // ¡Cambiamos Long por String en dateString!
+    // ¡AQUÍ ESTÁ LA LISTA QUE FALTA! (Lista 4: HISTORIAL)
+    val historyTasks: StateFlow<List<TaskEntity>> = taskRepository.getHistoryTasks()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     fun saveTask(
         title: String,
         description: String,
-        dateString: String, // Ahora recibimos el texto "dd/MM/yyyy"
+        dateString: String,
         timeString: String,
         isFavorite: Boolean
     ) {
         viewModelScope.launch {
-            // 1. Convertimos el texto que el usuario ve a una fecha local
             val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val date = formatter.parse(dateString) ?: Date()
 
-            // 2. Pasamos esa fecha por DateUtils para normalizarla a las 00:00:00 exactas
             val normalizedTimestamp = DateUtils.inicioDia(date.time)
 
             val newTask = TaskEntity(
                 title = title,
                 description = description,
-                dateTimestamp = normalizedTimestamp, // Guardamos la fecha perfectamente alineada
+                dateTimestamp = normalizedTimestamp,
                 timeString = timeString,
                 isFavorite = isFavorite,
                 isCompleted = false

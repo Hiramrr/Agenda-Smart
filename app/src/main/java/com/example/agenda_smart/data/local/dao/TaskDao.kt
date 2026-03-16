@@ -27,4 +27,8 @@ interface TaskDao {
     // NUEVA: Tareas programadas para después de hoy
     @Query("SELECT * FROM tasks WHERE dateTimestamp > :dayTimestamp ORDER BY dateTimestamp ASC, timeString ASC")
     fun getUpcomingTasks(dayTimestamp: Long): Flow<List<TaskEntity>>
+
+    // NUEVA: Tareas del historial (ya pasaron de fecha o están completadas)
+    @Query("SELECT * FROM tasks WHERE dateTimestamp < :dayTimestamp OR isCompleted = 1 ORDER BY dateTimestamp DESC, timeString DESC")
+    fun getHistoryTasks(dayTimestamp: Long): Flow<List<TaskEntity>>
 }

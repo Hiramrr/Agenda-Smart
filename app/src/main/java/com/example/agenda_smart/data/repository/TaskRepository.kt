@@ -27,4 +27,10 @@ class TaskRepository @Inject constructor(
     fun getFavoriteTasks(): Flow<List<TaskEntity>> {
         return taskDao.getFavoriteTasks()
     }
+
+    // Exponemos el historial (Tareas pasadas o completadas)
+    fun getHistoryTasks(): Flow<List<TaskEntity>> {
+        val today = DateUtils.inicioDia()
+        return taskDao.getHistoryTasks(today)
+    }
 }

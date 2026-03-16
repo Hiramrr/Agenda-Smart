@@ -15,19 +15,24 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.agenda_smart.data.local.entity.TaskEntity
 import com.example.agenda_smart.ui.navigation.Screen
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
     rootNavController: NavHostController,
-    viewModel: HomeViewModel = hiltViewModel() // Inyectamos el ViewModel
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val tabs = listOf("Hoy", "Programados", "Importante")
+    // ¡Agregamos la cuarta pestaña!
+    val tabs = listOf("Hoy", "Programados", "Importante", "Historial")
     var selectedTab by remember { mutableIntStateOf(0) }
 
-    // Observamos las TRES listas distintas ahora
     val todayTasks by viewModel.todayTasks.collectAsState()
     val upcomingTasks by viewModel.upcomingTasks.collectAsState()
     val favoriteTasks by viewModel.favoriteTasks.collectAsState()
+    // Observamos el historial
+    val historyTasks by viewModel.historyTasks.collectAsState()
 
     Scaffold(
         floatingActionButton = {
@@ -36,11 +41,16 @@ fun HomeScreen(
             }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            TabRow(selectedTabIndex = selectedTab) {
+            // Hacemos el TabRow desplazable (ScrollableTabRow) porque 4 pestañas pueden no caber en pantallas pequeñas
+            ScrollableTabRow(
+                selectedTabIndex = selectedTab,
+                edgePadding = 8.dp
+            ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTab == index,
@@ -50,11 +60,11 @@ fun HomeScreen(
                 }
             }
 
-            // ¡AQUÍ ESTÁ LA MAGIA DE LAS PESTAÑAS!
             val tasksToShow = when (selectedTab) {
-                0 -> todayTasks     // Pestaña 0: Tareas con la fecha de hoy
-                1 -> upcomingTasks  // Pestaña 1: Tareas con fecha del futuro
-                2 -> favoriteTasks  // Pestaña 2: Tareas marcadas con estrella
+                0 -> todayTasks
+                1 -> upcomingTasks
+                2 -> favoriteTasks
+                3 -> historyTasks // ¡Mostramos el historial!
                 else -> emptyList()
             }
 
@@ -78,9 +88,16 @@ fun HomeScreen(
     }
 }
 
-// Componente visual para cada Tarea (Tarjetita)
 @Composable
 fun TaskCard(task: TaskEntity) {
+    // Convertimos los milisegundos a un texto legible (Ej. 25/10/2023)
+    val formatter = remember {
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+            timeZone = java.util.TimeZone.getTimeZone("UTC")
+        }
+    }
+    val dateString = formatter.format(Date(task.dateTimestamp))
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -103,9 +120,11 @@ fun TaskCard(task: TaskEntity) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Hora: ${task.timeString}", style = MaterialTheme.typography.bodySmall)
+                // Ahora mostramos la fecha junto con la hora
+                Text(text = "$dateString • ${task.timeString}", style = MaterialTheme.typography.bodySmall)
+
                 if (task.isFavorite) {
-                    Text(text = "⭐ Importante", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                    Text(text = "⭐", style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
