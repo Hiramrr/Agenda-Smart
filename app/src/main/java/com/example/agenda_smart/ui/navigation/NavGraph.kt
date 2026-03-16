@@ -7,6 +7,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
 
+import com.example.agenda_smart.ui.screens.home.AddTaskScreen // Importa tu nueva pantalla
+
 @Composable
 fun NavGraph() {
     val rootNavController = rememberNavController()
@@ -15,9 +17,9 @@ fun NavGraph() {
         navController = rootNavController,
         startDestination = Screen.Task.route
     ){
-       composable(Screen.Task.route) {
-           MainScreen(rootNavController)
-       }
+        composable(Screen.Task.route) {
+            MainScreen(rootNavController)
+        }
         composable(Screen.Calendar.route) {
             MainScreen(rootNavController)
         }
@@ -25,9 +27,12 @@ fun NavGraph() {
             route = Screen.Detail.ROUTE,
             arguments = listOf(navArgument("taskId") { type = NavType.IntType })
         ) {
+            // Contenido de DetailScreen
         }
+
+        // ¡Aquí conectamos la ruta con la pantalla!
         composable(Screen.AddTask.route) {
+            AddTaskScreen(navController = rootNavController)
         }
     }
-
 }
