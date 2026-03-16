@@ -4,7 +4,13 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "tasks")
-data class TaskEntity (
+data class TaskEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0
+    val id: Int = 0,
+    val title: String,
+    val description: String,
+    val dateTimestamp: Long, // Para guardar la fecha del día
+    val timeString: String,  // Para guardar la hora exacta (ej. "14:30")
+    val isCompleted: Boolean = false,
+    val isFavorite: Boolean = false
 )
