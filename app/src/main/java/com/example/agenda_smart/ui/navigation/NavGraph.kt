@@ -8,7 +8,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.NavType
 
 import com.example.agenda_smart.ui.screens.home.AddTaskScreen // Importa tu nueva pantalla
-
+import com.example.agenda_smart.ui.screens.detail.DetailScreen // ¡AGREGA ESTA LÍNEA!
 @Composable
 fun NavGraph() {
     val rootNavController = rememberNavController()
@@ -28,6 +28,7 @@ fun NavGraph() {
             arguments = listOf(navArgument("taskId") { type = NavType.IntType })
         ) {
             // Contenido de DetailScreen
+            DetailScreen(navController = rootNavController)
         }
 
         // ¡Aquí conectamos la ruta con la pantalla!

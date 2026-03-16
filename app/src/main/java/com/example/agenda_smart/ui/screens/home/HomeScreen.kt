@@ -96,8 +96,7 @@ fun HomeScreen(
                         TaskCard(
                             task = task,
                             onClick = {
-                                // Aquí, más adelante, pondremos el código para ir a Screen.Detail
-                                // Por ahora, un toque normal no hará nada para que no moleste.
+                                rootNavController.navigate(Screen.Detail.createRoute(task.id))
                             },
                             onLongClick = {
                                 selectedTask = task // ¡Aquí activamos el menú inferior!
