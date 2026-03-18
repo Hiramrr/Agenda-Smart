@@ -20,4 +20,5 @@ sealed class Screen(val route: String) {
 
     object  AddTask : Screen("add_task")
 
+    object Weather : Screen("weather")
 }

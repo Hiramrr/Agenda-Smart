@@ -8,7 +8,8 @@ import androidx.navigation.navArgument
 import androidx.navigation.NavType
 
 import com.example.agenda_smart.ui.screens.home.AddTaskScreen // Importa tu nueva pantalla
-import com.example.agenda_smart.ui.screens.detail.DetailScreen // ¡AGREGA ESTA LÍNEA!
+import com.example.agenda_smart.ui.screens.detail.DetailScreen
+
 @Composable
 fun NavGraph() {
     val rootNavController = rememberNavController()

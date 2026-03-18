@@ -1,8 +1,10 @@
 package com.example.agenda_smart.ui.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.Cloud // ¡Nuevo ícono para el clima!
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -10,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -18,10 +21,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.padding
+
 import com.example.agenda_smart.ui.screens.calendar.CalendarScreen
 import com.example.agenda_smart.ui.screens.home.HomeScreen
+import com.example.agenda_smart.ui.screens.weather.WeatherScreen
 
 data class BottonNavItem(
     val label: String,
@@ -33,9 +36,11 @@ data class BottonNavItem(
 fun MainScreen(rootNavController: NavHostController) {
     val tabNavController = rememberNavController()
 
+    // ¡Agregamos el Clima como el tercer botón de la barra!
     val items = listOf(
         BottonNavItem("Tareas", Icons.Filled.CheckBox, Screen.Task),
-        BottonNavItem("Calendario", Icons.Filled.CalendarMonth, Screen.Calendar)
+        BottonNavItem("Calendario", Icons.Filled.CalendarMonth, Screen.Calendar),
+        BottonNavItem("Clima", Icons.Filled.Cloud, Screen.Weather)
     )
 
     Scaffold(
@@ -58,8 +63,8 @@ fun MainScreen(rootNavController: NavHostController) {
                                 restoreState = true
                             }
                         },
-                        icon = {Icon(item.icon, contentDescription = item.label)},
-                        label = {Text(item.label)}
+                        icon = { Icon(item.icon, contentDescription = item.label) },
+                        label = { Text(item.label) }
                     )
                 }
             }
@@ -75,6 +80,9 @@ fun MainScreen(rootNavController: NavHostController) {
             }
             composable(Screen.Calendar.route) {
                 CalendarScreen()
+            }
+            composable(Screen.Weather.route) {
+                WeatherScreen()
             }
         }
     }
